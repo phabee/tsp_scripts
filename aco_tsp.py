@@ -10,7 +10,7 @@ def euclidean(a, b):
     return math.sqrt(pow(a[1] - b[1], 2) + pow(a[0] - b[0], 2))
 
 def main():
-    dat = pd.read_csv("./data/TSP_Instances/pr1002.tsp", sep='\t', skiprows=2, names=['nodeId', 'lat', 'lng'])
+    dat = pd.read_csv("./TSP_Instances/pr1002.tsp", sep='\t', skiprows=2, names=['nodeId', 'lat', 'lng'])
     nodes = [tuple(x) for x in dat.to_numpy()]
     # nodes.append((dat.lat.array, dat.lng.array, dat.nodeId.array))
     world = pants.World(nodes, euclidean)
