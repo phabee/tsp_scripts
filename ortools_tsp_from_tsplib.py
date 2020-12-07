@@ -88,7 +88,6 @@ def main():
     # Print solution on console.
     if solution:
         print_solution(manager, routing, solution)
-        print("Solution is ", round(solution.ObjectiveValue() / 7544 * 100 - 100), "% more expensive than optimum." )
 
 if __name__ == '__main__':
     main()
