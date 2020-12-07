@@ -1,0 +1,8 @@
+import scipy.spatial as sp
+import numpy as np
+
+A = np.array([[1,2,3],[2,3,4],[0,1,2]])
+B = np.array([[1,2,3],[4,3,2]])
+
+a = sp.distance_matrix(A, B)
+print(a)
