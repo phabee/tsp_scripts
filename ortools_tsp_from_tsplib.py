@@ -21,7 +21,7 @@ def create_data_model(dima):
     return data
 
 
-def print_solution(manager, routing, solution):
+def print_solution(manager, routing, solution, dima):
     """Prints solution on console."""
     print('Objective: {} miles'.format(solution.ObjectiveValue()))
     index = routing.Start(0)
@@ -33,16 +33,16 @@ def print_solution(manager, routing, solution):
         index = solution.Value(routing.NextVar(index))
         route_distance += routing.GetArcCostForVehicle(previous_index, index, 0)
     plan_output += ' {}\n'.format(manager.IndexToNode(index))
+    plan_output += 'Route distance: {} miles\n'.format(route_distance)
     print(plan_output)
-    plan_output += 'Route distance: {}miles\n'.format(route_distance)
 
 
 def main():
     # load tsp instance
-    tsp = pd.read_csv("./TSP_Instances/berlin52.tsp", sep='\t', skiprows=2, names=['nodeId', 'lat', 'lng'])
+    tsp = pd.read_csv("./TSP_Instances/bier127.tsp", sep='\t', skiprows=2, names=['nodeId', 'lat', 'lng'])
     tsp = tsp.sort_values(by='nodeId', inplace=False)
 
-    A = tsp[['lat', 'lng']].to_numpy()
+    A = tsp[['lat', 'lng']].to_numpy()*100
     dima = sp.distance_matrix(A, A)
 
     """Entry point of the program."""
@@ -55,7 +55,6 @@ def main():
 
     # Create Routing Model.
     routing = pywrapcp.RoutingModel(manager)
-
 
     def distance_callback(from_index, to_index):
         """Returns the distance between the two nodes."""
@@ -87,7 +86,7 @@ def main():
 
     # Print solution on console.
     if solution:
-        print_solution(manager, routing, solution)
+        print_solution(manager, routing, solution, dima)
 
 if __name__ == '__main__':
     main()
