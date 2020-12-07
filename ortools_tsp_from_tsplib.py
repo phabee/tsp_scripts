@@ -39,7 +39,7 @@ def print_solution(manager, routing, solution, dima):
 
 def main():
     # load tsp instance
-    tsp = pd.read_csv("./TSP_Instances/bier127.tsp", sep='\t', skiprows=2, names=['nodeId', 'lat', 'lng'])
+    tsp = pd.read_csv("./TSP_Instances/berlin52.tsp", sep='\t', skiprows=2, names=['nodeId', 'lat', 'lng'])
     tsp = tsp.sort_values(by='nodeId', inplace=False)
 
     A = tsp[['lat', 'lng']].to_numpy()*100
