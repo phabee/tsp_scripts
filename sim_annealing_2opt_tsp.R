@@ -36,6 +36,7 @@ simulatedAnnealing <- function(tsp, dima, T0 = 1e2, alpha = 0.9) {
       if (exp(-dist/T) > u) {
         # if Temp allows accepting bad value
         cur_sol <- new_sol
+        cur_dist <- new_dist
       }
     }
     if (cur_dist < best_dist) {
