@@ -4,19 +4,17 @@
 #' @param dima the distance matrix
 #' @param T0 initial temperature
 #' @param alpha the temperature reduction factor per iteration
-#' @param reheats number of reheats
 #'
 #' @return the solution
 #' @export
-simulatedAnnealing <- function(tsp, dima, T0 = 1e2, alpha = 0.90, 
-                               max_nonimpr_its=4000, reheats = 10) {
+simulatedAnnealing <- function(tsp, dima, T0 = 1e2, alpha = 0.9) {
   # code see slide 53 from week 10
-  cur_sol <- getRandomTour(tsp = tsp)
-  # cur_sol <- constructNearestNeighborSolution(tsp, dima)
+  # cur_sol <- getRandomTour(tsp = tsp)
+  set.seed(1234)
+  cur_sol <- constructNearestNeighborSolution(tsp, dima)
   cur_dist <- calculateTourDistance(cur_sol, dima)
   best_sol <- cur_sol
   best_dist <- cur_dist
-  num_reheat <- reheats
   T <- T0
   cnt_non_improving_subsequent_iterations <- 0
   while(TRUE) {
@@ -39,6 +37,7 @@ simulatedAnnealing <- function(tsp, dima, T0 = 1e2, alpha = 0.90,
       if (exp(-dist/T) > u) {
         # if Temp allows accepting bad value
         cur_sol <- new_sol
+        cur_dist <- new_dist
       }
     }
     if (cur_dist < best_dist) {
@@ -48,20 +47,13 @@ simulatedAnnealing <- function(tsp, dima, T0 = 1e2, alpha = 0.90,
       cnt_non_improving_subsequent_iterations <- 0
       cat("best sol: ", best_dist, "tour: ", best_sol, "\n")
     } else {
-      # increase unsuccessful iteration counter
+        # increase unsuccessful iteration counter
       cnt_non_improving_subsequent_iterations <- 
         cnt_non_improving_subsequent_iterations +1
     }
     T <- T / (1 + alpha*T)
-    if (cnt_non_improving_subsequent_iterations > max_nonimpr_its)
+    if (cnt_non_improving_subsequent_iterations > 300)
       break
-    else if (reheats >0 && num_reheat > 0 && cnt_non_improving_subsequent_iterations > 
-             max_nonimpr_its * (reheats - num_reheat + 1)/reheats) {
-      T <- T0
-      cat("**** reheating (countdown = ", num_reheat, ") ****","\n")
-      num_reheat <- num_reheat - 1
-      cnt_non_improving_subsequent_iterations <- 0
-    }
   }
   return(best_sol)
 }
@@ -223,7 +215,7 @@ calculateTourDistance <- function(tour, dima) {
 #' @return the distance
 #' @export
 getDimaDist <- function(fromLoc, toLoc, dima) {
-  dimaEntry <- dima[loc_from == fromLoc & loc_to == toLoc]
+  dimaEntry <- dima[I(loc_from == fromLoc & loc_to == toLoc)]
   if (nrow(dimaEntry) != 1) {
     # if a / b lookup failed, try other way round (since we store only one
     # direction) in the distance matrix.
@@ -232,8 +224,8 @@ getDimaDist <- function(fromLoc, toLoc, dima) {
       stop(
         paste0(
           "Expected to find exactly one dima entry corresponding to the given loc_from/loc_to-pair ",
-          loc_from,
-          loc_to,
+          fromLoc, "/",
+          toLoc,
           " but found 0 or more than 1."
         )
       )
@@ -241,6 +233,14 @@ getDimaDist <- function(fromLoc, toLoc, dima) {
   }
   return(dimaEntry$dist)
 }
+
+# best sol:  8039.982 tour:  26 11 27 25 46 28 29 1 6 41 20 22 19 49 15 43 45 24 3 5 14 4 23 47 37 36 39 38 33 34 35 48 31 0 21 30 17 16 2 44 18 40 7 8 9 42 32 50 10 51 13 12 
+#  [1] 26 11 27 25 46 28 29  1  6 41 20 22 19 49 15 43 45 24  3  5 14  4 23 47 37 36 39 38 33 34 35 48 31  0 21 30
+# [37] 17 16  2 44 18 40  7  8  9 42 32 50 10 51 13 12
+
+# best sol:  8001.643 
+#  [1] 29 28 46 25 27 26 12 13 51 10 50 11 24  3  5 14  4 23 47 37 36 39 38 35 34 33 43 45 15 49 19 22 30 17 21
+# [36]  0 48 31 44 42 32  9  8  7 40 18  2 16 20 41  6  1
 
 tsp <- read.table("berlin52.tsp", skip = 2, col.names = c("stop_id", "lat", "lng"))
 tour <- renderTour(tsp)
